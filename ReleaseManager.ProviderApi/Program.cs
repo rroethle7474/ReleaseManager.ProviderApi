@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReleaseManager.Core.Interfaces;
+using ReleaseManager.ProviderApi.Middleware;
 using ReleaseManager.ProviderApi.Providers;
 using System.Text;
 
@@ -34,6 +35,9 @@ builder.Services.AddAuthentication(options =>
 // Register services
 builder.Services.AddSingleton<IProviderFactory, ProviderFactory>();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("IdentityApi", client => {
+    client.BaseAddress = new Uri(builder.Configuration["IdentityApi:BaseUrl"]);
+});
 
 // Configure API versioning
 builder.Services.AddApiVersioning(options =>
@@ -110,6 +114,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<AzureTokenValidationMiddleware>();
 app.MapControllers();
 
 app.Run();
