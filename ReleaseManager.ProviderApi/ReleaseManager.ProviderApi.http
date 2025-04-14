@@ -1,0 +1,6 @@
+@ReleaseManager.ProviderApi_HostAddress = http://localhost:5103
+
+GET {{ReleaseManager.ProviderApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
