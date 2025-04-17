@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReleaseManager.Core.Interfaces;
+using ReleaseManager.ProviderApi.Clients;
 using ReleaseManager.ProviderApi.Middleware;
 using ReleaseManager.ProviderApi.Providers;
 using System.Text;
@@ -34,9 +35,11 @@ builder.Services.AddAuthentication(options =>
 
 // Register services
 builder.Services.AddSingleton<IProviderFactory, ProviderFactory>();
-builder.Services.AddHttpClient();
-builder.Services.AddHttpClient("IdentityApi", client => {
+
+builder.Services.AddHttpClient<IIdentityApiClient, IdentityApiClient>(client =>
+{
     client.BaseAddress = new Uri(builder.Configuration["IdentityApi:BaseUrl"]);
+    // You can add default headers, timeout settings, etc. here
 });
 
 // Configure API versioning
@@ -109,6 +112,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseErrorHandling();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigins");

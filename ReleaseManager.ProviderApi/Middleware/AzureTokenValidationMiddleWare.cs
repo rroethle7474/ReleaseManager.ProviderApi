@@ -1,8 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net;
+﻿using ReleaseManager.Core.Exceptions;
+using ReleaseManager.ProviderApi.Clients;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text.Json;
-using System.Text;
 
 namespace ReleaseManager.ProviderApi.Middleware
 {
@@ -10,19 +9,16 @@ namespace ReleaseManager.ProviderApi.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<AzureTokenValidationMiddleware> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly HttpClient _httpClient;
+        private readonly IIdentityApiClient _identityApiClient;
 
         public AzureTokenValidationMiddleware(
             RequestDelegate next,
             ILogger<AzureTokenValidationMiddleware> logger,
-            IConfiguration configuration,
-            IHttpClientFactory httpClientFactory)
+            IIdentityApiClient identityApiClient)
         {
             _next = next;
             _logger = logger;
-            _configuration = configuration;
-            _httpClient = httpClientFactory.CreateClient("IdentityApi");
+            _identityApiClient = identityApiClient;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -65,17 +61,9 @@ namespace ReleaseManager.ProviderApi.Middleware
 
                                 if (!string.IsNullOrEmpty(userId))
                                 {
-                                    var refreshResponse = await _httpClient.PostAsync(
-                                        $"{_configuration["IdentityApi:BaseUrl"]}/api/CloudProvider/refresh-token",
-                                        new StringContent(
-                                            JsonSerializer.Serialize(new { UserId = userId }),
-                                            Encoding.UTF8,
-                                            "application/json"));
-
-                                    if (refreshResponse.IsSuccessStatusCode)
+                                    try
                                     {
-                                        var tokenResult = await refreshResponse.Content
-                                            .ReadFromJsonAsync<TokenRefreshResponse>();
+                                        var tokenResult = await _identityApiClient.RefreshTokenAsync(userId);
 
                                         if (tokenResult != null && !string.IsNullOrEmpty(tokenResult.Token))
                                         {
@@ -91,7 +79,7 @@ namespace ReleaseManager.ProviderApi.Middleware
                                             });
                                         }
                                     }
-                                    else if (refreshResponse.StatusCode == HttpStatusCode.Unauthorized)
+                                    catch (AuthenticationException ex) when (ex.Message.Contains("expired"))
                                     {
                                         // Token couldn't be refreshed, user needs to re-authenticate
                                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -102,6 +90,11 @@ namespace ReleaseManager.ProviderApi.Middleware
                                             requires_reauth = true
                                         });
                                         return;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogError(ex, "Error refreshing token");
+                                        // Continue to the next middleware - we'll try using the old token
                                     }
                                 }
                             }
@@ -119,10 +112,5 @@ namespace ReleaseManager.ProviderApi.Middleware
             // Call the next middleware in the pipeline
             await _next(context);
         }
-    }
-
-    public class TokenRefreshResponse
-    {
-        public string Token { get; set; }
     }
 }
