@@ -26,7 +26,7 @@ namespace ReleaseManager.ProviderApi.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetProjects(
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -35,11 +35,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var projectService = _providerFactory.CreateProjectService(providerName, credentials);
+                var projectService = _providerFactory.CreateProjectService(providerId, credentials);
                 var projects = await projectService.GetProjectsAsync();
 
                 return Ok(projects);
@@ -62,7 +62,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         [HttpGet("{projectId}")]
         public async Task<IActionResult> GetProjectById(
             string projectId,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1  ,
             [FromQuery] string organization = null)
         {
             try
@@ -71,11 +71,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var projectService = _providerFactory.CreateProjectService(providerName, credentials);
+                var projectService = _providerFactory.CreateProjectService(providerId, credentials);
                 var project = await projectService.GetProjectByIdAsync(projectId);
 
                 return Ok(project);

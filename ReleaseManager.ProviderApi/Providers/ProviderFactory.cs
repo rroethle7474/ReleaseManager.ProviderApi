@@ -1,4 +1,4 @@
-﻿using ReleaseManager.ProviderApi.AzureDevOps;
+using ReleaseManager.ProviderApi.AzureDevOps;
 using ReleaseManager.Core.Exceptions;
 using ReleaseManager.Core.Interfaces;
 using ReleaseManager.Core.Models;
@@ -14,24 +14,28 @@ namespace ReleaseManager.ProviderApi.Providers
             _httpClientFactory = httpClientFactory;
         }
 
-        public IPipelineService CreatePipelineService(string providerName, CloudProviderCredentials credentials)
+        public IPipelineService CreatePipelineService(int providerId, CloudProviderCredentials credentials)
         {
-            return providerName.ToLowerInvariant() switch
+            switch (providerId)
             {
-                "azuredevops" => new AzureDevOpsPipelineService(_httpClientFactory, credentials),
+                case 1: // AzureDevOps
+                    return new AzureDevOpsPipelineService(_httpClientFactory, credentials);
                 // Add more providers as needed
-                _ => throw new ProviderNotFoundException(providerName)
-            };
+                default:
+                    throw new ProviderNotFoundException($"Unknown providerId: {providerId}");
+            }
         }
 
-        public IReleaseService CreateReleaseService(string providerName, CloudProviderCredentials credentials)
+        public IReleaseService CreateReleaseService(int providerId, CloudProviderCredentials credentials)
         {
-            return providerName.ToLowerInvariant() switch
+            switch (providerId)
             {
-                "azuredevops" => new AzureDevOpsReleaseService(_httpClientFactory, credentials),
+                case 1: // AzureDevOps
+                    return new AzureDevOpsReleaseService(_httpClientFactory, credentials);
                 // Add more providers as needed
-                _ => throw new ProviderNotFoundException(providerName)
-            };
+                default:
+                    throw new ProviderNotFoundException($"Unknown providerId: {providerId}");
+            }
         }
 
         public IProjectService CreateProjectService(string providerName, CloudProviderCredentials credentials)
@@ -42,6 +46,18 @@ namespace ReleaseManager.ProviderApi.Providers
                 // Add more providers as needed
                 _ => throw new ProviderNotFoundException(providerName)
             };
+        }
+
+        public IProjectService CreateProjectService(int providerId, CloudProviderCredentials credentials)
+        {
+            switch (providerId)
+            {
+                case 1: // AzureDevOps
+                    return new AzureDevOpsProjectService(_httpClientFactory, credentials);
+                // Add more providers as needed
+                default:
+                    throw new ProviderNotFoundException($"Unknown providerId: {providerId}");
+            }
         }
     }
 }

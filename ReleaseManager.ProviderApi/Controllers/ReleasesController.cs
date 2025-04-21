@@ -27,7 +27,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         [HttpGet("{projectId}")]
         public async Task<IActionResult> GetReleases(
             string projectId,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -36,11 +36,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var releaseService = _providerFactory.CreateReleaseService(providerName, credentials);
+                var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);
                 var releases = await releaseService.GetReleasesAsync(projectId);
 
                 return Ok(releases);
@@ -64,7 +64,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         public async Task<IActionResult> GetReleaseById(
             string projectId,
             string releaseId,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -73,11 +73,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var releaseService = _providerFactory.CreateReleaseService(providerName, credentials);
+                var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);
                 var release = await releaseService.GetReleaseByIdAsync(projectId, releaseId);
 
                 return Ok(release);
@@ -101,7 +101,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         public async Task<IActionResult> CreateRelease(
             string projectId,
             [FromBody] ReleaseOptions options,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -114,7 +114,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AuthMethodId = 1
                 };
 
-                var releaseService = _providerFactory.CreateReleaseService(providerName, credentials);
+                var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);
                 var release = await releaseService.CreateReleaseAsync(projectId, options);
 
                 return CreatedAtAction(nameof(GetReleaseById), new { projectId, releaseId = release.Id }, release);
@@ -138,7 +138,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         public async Task<IActionResult> DeleteRelease(
             string projectId,
             string releaseId,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -147,11 +147,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var releaseService = _providerFactory.CreateReleaseService(providerName, credentials);
+                var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);
                 var result = await releaseService.DeleteReleaseAsync(projectId, releaseId);
 
                 if (result)

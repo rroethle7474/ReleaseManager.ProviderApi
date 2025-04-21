@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReleaseManager.Core.Exceptions;
@@ -27,22 +27,20 @@ namespace ReleaseManager.ProviderApi.Controllers
         [HttpGet("{projectId}")]
         public async Task<IActionResult> GetPipelines(
             string projectId,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
             {
-                // In a real implementation, you would get credentials from a service
-                // This is just a placeholder
                 var credentials = new CloudProviderCredentials
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1, // Azure DevOps
+                    ProviderId = providerId,
                     AuthMethodId = 1 // PAT
                 };
 
-                var pipelineService = _providerFactory.CreatePipelineService(providerName, credentials);
+                var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
                 var pipelines = await pipelineService.GetPipelinesAsync(projectId);
 
                 return Ok(pipelines);
@@ -68,7 +66,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         public async Task<IActionResult> GetPipelineById(
             string projectId,
             string pipelineId,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -77,11 +75,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var pipelineService = _providerFactory.CreatePipelineService(providerName, credentials);
+                var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
                 var pipeline = await pipelineService.GetPipelineByIdAsync(projectId, pipelineId);
 
                 return Ok(pipeline);
@@ -106,7 +104,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string projectId,
             string pipelineId,
             [FromBody] PipelineRunOptions options,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -115,11 +113,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var pipelineService = _providerFactory.CreatePipelineService(providerName, credentials);
+                var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
                 var run = await pipelineService.RunPipelineAsync(projectId, pipelineId, options);
 
                 return Ok(run);
@@ -144,7 +142,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string projectId,
             string pipelineId,
             [FromQuery] int limit = 10,
-            [FromQuery] string providerName = "AzureDevOps",
+            [FromQuery] int providerId = 1, // Default to Azure DevOps
             [FromQuery] string organization = null)
         {
             try
@@ -153,11 +151,11 @@ namespace ReleaseManager.ProviderApi.Controllers
                 {
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
-                    ProviderId = 1,
+                    ProviderId = providerId,
                     AuthMethodId = 1
                 };
 
-                var pipelineService = _providerFactory.CreatePipelineService(providerName, credentials);
+                var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
                 var runs = await pipelineService.GetPipelineRunsAsync(projectId, pipelineId, limit);
 
                 return Ok(runs);
