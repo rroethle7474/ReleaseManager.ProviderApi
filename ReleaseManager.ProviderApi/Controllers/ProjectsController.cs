@@ -27,6 +27,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProjects(
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -36,7 +37,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var projectService = _providerFactory.CreateProjectService(providerId, credentials);
@@ -62,7 +63,8 @@ namespace ReleaseManager.ProviderApi.Controllers
         [HttpGet("{projectId}")]
         public async Task<IActionResult> GetProjectById(
             string projectId,
-            [FromQuery] int providerId = 1  ,
+            [FromQuery] int providerId = 1,
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -72,7 +74,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var projectService = _providerFactory.CreateProjectService(providerId, credentials);

@@ -28,6 +28,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         public async Task<IActionResult> GetReleases(
             string projectId,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -37,7 +38,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);
@@ -65,6 +66,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string projectId,
             string releaseId,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -74,7 +76,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);
@@ -102,6 +104,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string projectId,
             [FromBody] ReleaseOptions options,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -111,7 +114,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = 1,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);
@@ -139,6 +142,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string projectId,
             string releaseId,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -148,7 +152,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var releaseService = _providerFactory.CreateReleaseService(providerId, credentials);

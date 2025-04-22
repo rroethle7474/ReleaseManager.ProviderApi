@@ -28,6 +28,7 @@ namespace ReleaseManager.ProviderApi.Controllers
         public async Task<IActionResult> GetPipelines(
             string projectId,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -37,7 +38,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1 // PAT
+                    AuthMethodId = authMethodId // PAT
                 };
 
                 var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
@@ -67,6 +68,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string projectId,
             string pipelineId,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -76,7 +78,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
@@ -105,6 +107,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string pipelineId,
             [FromBody] PipelineRunOptions options,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -114,7 +117,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
@@ -143,6 +146,7 @@ namespace ReleaseManager.ProviderApi.Controllers
             string pipelineId,
             [FromQuery] int limit = 10,
             [FromQuery] int providerId = 1, // Default to Azure DevOps
+            [FromQuery] int authMethodId = 1, // Default to PAC
             [FromQuery] string organization = null)
         {
             try
@@ -152,7 +156,7 @@ namespace ReleaseManager.ProviderApi.Controllers
                     AccessToken = HttpContext.Request.Headers["Provider-Token"],
                     Organization = organization,
                     ProviderId = providerId,
-                    AuthMethodId = 1
+                    AuthMethodId = authMethodId
                 };
 
                 var pipelineService = _providerFactory.CreatePipelineService(providerId, credentials);
